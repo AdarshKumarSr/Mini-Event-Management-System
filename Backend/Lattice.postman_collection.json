@@ -1,0 +1,139 @@
+{
+  "info": {
+    "_postman_id": "98a716af-00ac-416c-9253-2039b8f88db1",
+    "name": "Lattice",
+    "description": "## Lattice\n\nThis collection covers the core API workflows for the **Lattice** event management platform. It provides endpoints to manage events and handle user bookings and attendance.\n\n### Endpoints\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| POST | `/api/events` | Create a new event |\n| POST | `/api/bookings` | Book a ticket for an event |\n| POST | `/api/events/:id/attendance` | Mark attendance for an event |\n| GET | `/api/bookings` | Retrieve all bookings for a user |\n| GET | `/api/events` | Retrieve a list of all events |\n\n### Variables\n\nThe collection uses the following environment variables:\n\n- `{{url}}` — Base URL for the events service\n    \n- `http://localhost:3000` — Base URL for the bookings and attendance service (port 3000)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "39105518"
+  },
+  "item": [
+    {
+      "name": "Create an Event",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Tech Summit 2026\",\r\n  \"description\": \"Annual technology conference\",\r\n  \"date\": \"2026-05-15T10:00:00\",\r\n  \"total_capacity\": 100\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/events",
+          "host": [
+            "http://localhost:3000"
+          ],
+          "path": [
+            "api",
+            "events"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Book a Tkt",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"user_id\": 1,\r\n  \"event_id\": 2\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/bookings",
+          "host": [
+            "http://localhost:3000"
+          ],
+          "path": [
+            "api",
+            "bookings"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "mark attendence",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"booking_code\": \"BK-ZU5KDYCA\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/events/2/attendance",
+          "host": [
+            "http://localhost:3000"
+          ],
+          "path": [
+            "api",
+            "events",
+            "2",
+            "attendance"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get User Bookings",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"booking_code\": \"BK-589456A8\"\r\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/users/1/bookings",
+          "host": [
+            "http://localhost:3000"
+          ],
+          "path": [
+            "api",
+            "users",
+            "1",
+            "bookings"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all events",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/events",
+          "host": [
+            "http://localhost:3000"
+          ],
+          "path": [
+            "api",
+            "events"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

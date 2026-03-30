@@ -1,0 +1,417 @@
+openapi: 3.0.0
+info:
+  title: Mini Event Management System API
+  description: A RESTful API for browsing events, booking tickets, and managing attendance.
+  version: 1.0.0
+  contact:
+  name: Adarsh
+  url: https://adarsh3e8.in
+  email: adarsh3e8@email.com
+
+servers:
+  - url: http://localhost:3000/api
+    description: Local development server
+
+tags:
+  - name: Events
+    description: Event management endpoints
+  - name: Bookings
+    description: Ticket booking endpoints
+  - name: Attendance
+    description: Event attendance endpoints
+
+paths:
+
+  /events:
+    get:
+      tags:
+        - Events
+      summary: Get all upcoming events
+      description: Returns a list of all upcoming events sorted by date.
+      responses:
+        '200':
+          description: List of upcoming events
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  count:
+                    type: integer
+                    example: 3
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Event'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Events
+      summary: Create a new event
+      description: Creates a new event with title, description, date and capacity.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventRequest'
+            example:
+              title: "Tech Summit 2026"
+              description: "Annual technology conference"
+              date: "2026-05-15T10:00:00"
+              total_capacity: 100
+      responses:
+        '201':
+          description: Event created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Event created successfully
+                  data:
+                    $ref: '#/components/schemas/Event'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /bookings:
+    post:
+      tags:
+        - Bookings
+      summary: Book a ticket for an event
+      description: Books a ticket for a user. Checks ticket availability and updates remaining tickets using a transaction. Returns a unique booking code.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookingRequest'
+            example:
+              user_id: 1
+              event_id: 1
+      responses:
+        '201':
+          description: Ticket booked successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Ticket booked successfully
+                  data:
+                    $ref: '#/components/schemas/BookingResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /users/{id}/bookings:
+    get:
+      tags:
+        - Bookings
+      summary: Get all bookings of a user
+      description: Returns all bookings made by a specific user along with event details.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The user ID
+          example: 1
+      responses:
+        '200':
+          description: List of user bookings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  count:
+                    type: integer
+                    example: 2
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserBooking'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /events/{id}/attendance:
+    post:
+      tags:
+        - Attendance
+      summary: Mark attendance for an event
+      description: Takes a booking code as input, validates it and marks the user's attendance. Returns total tickets booked for the event.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The event ID
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttendanceRequest'
+            example:
+              booking_code: "BK-A3F2C1B4"
+      responses:
+        '200':
+          description: Attendance marked successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Attendance marked successfully
+                  data:
+                    $ref: '#/components/schemas/AttendanceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+
+    Event:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Tech Summit 2026
+        description:
+          type: string
+          example: Annual technology conference
+        date:
+          type: string
+          format: date-time
+          example: "2026-05-15T10:00:00"
+        total_capacity:
+          type: integer
+          example: 100
+        remaining_tickets:
+          type: integer
+          example: 95
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-03-30T10:00:00"
+
+    CreateEventRequest:
+      type: object
+      required:
+        - title
+        - date
+        - total_capacity
+      properties:
+        title:
+          type: string
+          example: Tech Summit 2026
+        description:
+          type: string
+          example: Annual technology conference
+        date:
+          type: string
+          format: date-time
+          example: "2026-05-15T10:00:00"
+        total_capacity:
+          type: integer
+          example: 100
+
+    CreateBookingRequest:
+      type: object
+      required:
+        - user_id
+        - event_id
+      properties:
+        user_id:
+          type: integer
+          example: 1
+        event_id:
+          type: integer
+          example: 1
+
+    BookingResponse:
+      type: object
+      properties:
+        booking_id:
+          type: integer
+          example: 1
+        booking_code:
+          type: string
+          example: BK-A3F2C1B4
+        user_id:
+          type: integer
+          example: 1
+        event_id:
+          type: integer
+          example: 1
+        event_title:
+          type: string
+          example: Tech Summit 2026
+        event_date:
+          type: string
+          format: date-time
+          example: "2026-05-15T10:00:00"
+
+    UserBooking:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        booking_code:
+          type: string
+          example: BK-A3F2C1B4
+        booking_date:
+          type: string
+          format: date-time
+          example: "2026-03-30T10:00:00"
+        title:
+          type: string
+          example: Tech Summit 2026
+        description:
+          type: string
+          example: Annual technology conference
+        event_date:
+          type: string
+          format: date-time
+          example: "2026-05-15T10:00:00"
+
+    AttendanceRequest:
+      type: object
+      required:
+        - booking_code
+      properties:
+        booking_code:
+          type: string
+          example: BK-A3F2C1B4
+
+    AttendanceResponse:
+      type: object
+      properties:
+        booking_code:
+          type: string
+          example: BK-A3F2C1B4
+        user_id:
+          type: integer
+          example: 1
+        event_id:
+          type: string
+          example: "1"
+        entry_time:
+          type: string
+          format: date-time
+          example: "2026-03-30T10:00:00"
+        total_tickets_booked:
+          type: integer
+          example: 5
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: No tickets available for this event
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: Event not found
+
+    ValidationError:
+      description: Validation failed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: Validation failed
+              errors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    field:
+                      type: string
+                      example: title
+                    message:
+                      type: string
+                      example: Title is required
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: Internal Server Error

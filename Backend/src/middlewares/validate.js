@@ -46,8 +46,21 @@ const validateAttendance = [
     handleValidationErrors
 ];
 
+const validateCreateUser = [
+    body('name')
+        .trim()
+        .notEmpty().withMessage('Name is required')
+        .isLength({ max: 100 }).withMessage('Name must be under 100 characters'),
+    body('email')
+        .trim()
+        .notEmpty().withMessage('Email is required')
+        .isEmail().withMessage('Must be a valid email'),
+    handleValidationErrors
+];
+
 module.exports = {
     validateCreateEvent,
     validateCreateBooking,
-    validateAttendance
+    validateAttendance,
+    validateCreateUser
 };

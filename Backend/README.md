@@ -20,6 +20,7 @@ A RESTful API built with **Node.js**, **Express.js**, and **MySQL** for managing
 ---
 
 ## 📁 Project Structure
+
 ```
 event-booking-system/
 ├── src/
@@ -28,13 +29,13 @@ event-booking-system/
 │   ├── models/           # Database queries
 │   ├── routes/           # API route definitions
 │   ├── middlewares/      # Validation & error handling
-│   └── utils/            # Helper functions (booking code generator)
+│   └── utils/            # Booking code generator
 ├── database/
 │   └── schema.sql        # Database schema with sample data
 ├── swagger.yaml          # OpenAPI 3.0 documentation
-├── Dockerfile            # Docker image configuration
+├── Dockerfile            # Docker image config
 ├── docker-compose.yml    # Multi-container setup
-├── server.js             # Application entry point
+├── server.js             # Entry point
 └── README.md
 ```
 
@@ -43,19 +44,22 @@ event-booking-system/
 ## ⚙️ Local Setup
 
 ### 1. Clone the repository
+
 ```bash
-git clone https://github.com/your-username/event-booking-system.git
+git clone https://github.com/AdarshKumarSr/event-booking-system.git
 cd event-booking-system
 ```
 
 ### 2. Install dependencies
+
 ```bash
 npm install
 ```
 
 ### 3. Configure environment variables
 
-Create a `.env` file in the root directory:
+Create a `.env` file in the root:
+
 ```env
 PORT=3000
 DB_HOST=localhost
@@ -66,56 +70,56 @@ DB_NAME=event_booking_db
 
 ### 4. Set up the database
 
-**On Mac/Linux:**
+**Mac/Linux:**
+
 ```bash
 mysql -u root -p < database/schema.sql
 ```
 
-**On Windows (PowerShell):**
+**Windows (PowerShell):**
+
 ```bash
 Get-Content database/schema.sql | mysql -u root -p
 ```
 
-**Or using MySQL Workbench:**
-- Open MySQL Workbench
-- Copy paste contents of `database/schema.sql`
+**MySQL Workbench:**
+- Open `database/schema.sql`
 - Click Execute ▶️
 
 ### 5. Run the server
-```bash
-# Development (with auto-restart)
-npm run dev
 
-# Production
-npm start
+```bash
+npm run dev    # Development (auto-restart)
+npm start      # Production
 ```
 
-✅ Server runs at `http://localhost:3000`
-📄 Swagger docs at `http://localhost:3000/api-docs`
+✅ Server → `http://localhost:3000`
+📄 Swagger → `http://localhost:3000/api-docs`
 
 ---
 
 ## 🐳 Docker Setup (One Click)
 
-Make sure Docker Desktop is installed, then run:
+Make sure Docker Desktop is installed, then:
+
 ```bash
 docker-compose up --build
 ```
 
-This will automatically:
+This will:
 - Start a MySQL 8.0 container
-- Import the database schema
+- Auto import the database schema
 - Start the Node.js app
 
-✅ Server runs at `http://localhost:3000`
-📄 Swagger docs at `http://localhost:3000/api-docs`
+✅ Server → `http://localhost:3000`
+📄 Swagger → `http://localhost:3000/api-docs`
 
-To stop:
 ```bash
-docker-compose down
+docker-compose down    # Stop everything
 ```
 
-### Pull from Docker Hub
+### Pull directly from Docker Hub
+
 ```bash
 docker pull bugboy3e8/event-booking-system:latest
 ```
@@ -124,91 +128,107 @@ docker pull bugboy3e8/event-booking-system:latest
 
 ## 📄 API Documentation
 
-Full Swagger UI available at:
-```
-http://localhost:3000/api-docs
-```
+Interactive Swagger UI at: http://localhost:3000/api-docs
 
 ---
 
 ## 📡 API Endpoints
 
+### Users
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/users` | Get all users |
+| POST | `/api/users` | Create a new user |
+| GET | `/api/users/:id` | Get user by ID |
+| GET | `/api/users/:id/bookings` | Get all bookings of a user |
+
+### Events
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/events` | List all upcoming events |
 | POST | `/api/events` | Create a new event |
+
+### Bookings & Attendance
+| Method | Endpoint | Description |
+|--------|----------|-------------|
 | POST | `/api/bookings` | Book a ticket (returns unique code) |
-| GET | `/api/users/:id/bookings` | Get all bookings of a user |
 | POST | `/api/events/:id/attendance` | Mark attendance via booking code |
 
 ---
 
 ## 🗄️ Database Design
 
-### Tables
-
-**users**
-| Column | Type | Description |
-|--------|------|-------------|
+**users** — stores user info
+| Column | Type | Notes |
+|--------|------|-------|
 | id | INT UNSIGNED | Primary key |
 | name | VARCHAR(100) | Full name |
-| email | VARCHAR(150) | Unique email |
-| created_at | TIMESTAMP | Auto-generated |
+| email | VARCHAR(150) | Unique |
+| created_at | TIMESTAMP | Auto |
 
-**events**
-| Column | Type | Description |
-|--------|------|-------------|
+**events** — stores event info
+| Column | Type | Notes |
+|--------|------|-------|
 | id | INT UNSIGNED | Primary key |
-| title | VARCHAR(200) | Event title |
-| description | TEXT | Event details |
-| date | DATETIME | Event date & time |
-| total_capacity | INT UNSIGNED | Max tickets |
-| remaining_tickets | INT UNSIGNED | Available tickets |
-| created_at | TIMESTAMP | Auto-generated |
+| title | VARCHAR(200) | - |
+| description | TEXT | - |
+| date | DATETIME | - |
+| total_capacity | INT UNSIGNED | - |
+| remaining_tickets | INT UNSIGNED | - |
+| created_at | TIMESTAMP | Auto |
 
-**bookings**
-| Column | Type | Description |
-|--------|------|-------------|
+**bookings** — links users to events
+| Column | Type | Notes |
+|--------|------|-------|
 | id | INT UNSIGNED | Primary key |
 | user_id | INT UNSIGNED | FK → users |
 | event_id | INT UNSIGNED | FK → events |
-| booking_code | VARCHAR(20) | Unique booking code |
-| booking_date | TIMESTAMP | Auto-generated |
+| booking_code | VARCHAR(20) | Unique |
+| booking_date | TIMESTAMP | Auto |
 
-**event_attendance**
-| Column | Type | Description |
-|--------|------|-------------|
+**event_attendance** — tracks entry
+| Column | Type | Notes |
+|--------|------|-------|
 | id | INT UNSIGNED | Primary key |
 | booking_id | INT UNSIGNED | FK → bookings (unique) |
 | user_id | INT UNSIGNED | FK → users |
 | event_id | INT UNSIGNED | FK → events |
-| entry_time | TIMESTAMP | Auto-generated |
+| entry_time | TIMESTAMP | Auto |
 
-### Relationships
-- One **user** → many **bookings**
-- One **event** → many **bookings**
-- One **booking** → one **attendance** record
+**Relationships:**
+- One user → many bookings
+- One event → many bookings
+- One booking → one attendance record
 
 ---
 
 ## 🔒 Race Condition Handling
 
-Ticket booking uses **MySQL transactions** to prevent overselling under concurrent load:
+Booking uses **MySQL transactions** to prevent overselling:
 
 1. `BEGIN TRANSACTION`
-2. Fetch event and check `remaining_tickets`
+2. Check `remaining_tickets`
 3. `UPDATE remaining_tickets WHERE remaining_tickets > 0`
-4. If `affectedRows === 0` → tickets just sold out → `ROLLBACK`
-5. Insert booking record
+4. If `affectedRows === 0` → sold out → `ROLLBACK`
+5. Insert booking
 6. `COMMIT`
-
-This guarantees tickets are **never oversold** even under high traffic.
 
 ---
 
 ## ✅ Sample Requests
 
+### Create a user
+
+```json
+POST /api/users
+{
+  "name": "Rahul Sharma",
+  "email": "rahul@example.com"
+}
+```
+
 ### Create an event
+
 ```json
 POST /api/events
 {
@@ -220,6 +240,7 @@ POST /api/events
 ```
 
 ### Book a ticket
+
 ```json
 POST /api/bookings
 {
@@ -229,6 +250,7 @@ POST /api/bookings
 ```
 
 ### Mark attendance
+
 ```json
 POST /api/events/1/attendance
 {
@@ -242,4 +264,4 @@ POST /api/events/1/attendance
 
 **Adarsh**
 - 🌐 [adarsh3e8.in](https://adarsh3e8.in)
-- 🐙 [GitHub](https://github.com/your-github-username)
+- 🐙 [GitHub](https://github.com/AdarshKumarSr)

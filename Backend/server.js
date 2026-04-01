@@ -6,6 +6,7 @@ const YAML = require('yamljs');
 dotenv.config();
 require('./src/config/db');
 
+const userRoutes = require('./src/routes/userRoutes');
 const eventRoutes = require('./src/routes/eventRoutes');
 const bookingRoutes = require('./src/routes/bookingRoutes');
 const attendanceRoutes = require('./src/routes/attendanceRoutes');
@@ -22,6 +23,7 @@ const swaggerDocument = YAML.load('./swagger.yaml');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // // Routes
+app.use('/api', userRoutes);
 app.use('/api', eventRoutes);
 app.use('/api', bookingRoutes);
 app.use('/api', attendanceRoutes);

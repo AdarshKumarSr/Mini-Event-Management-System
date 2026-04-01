@@ -435,8 +435,8 @@ components:
           type: integer
           example: 1
         event_id:
-          type: string
-          example: "1"
+          type: integer
+          example: 1
         entry_time:
           type: string
           format: date-time

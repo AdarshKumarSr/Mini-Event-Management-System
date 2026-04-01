@@ -13,10 +13,29 @@ const attendanceRoutes = require('./src/routes/attendanceRoutes');
 const errorHandler = require('./src/middlewares/errorHandler');
 
 
+
 const app = express();
 
 app.use(express.json());
 
+
+// Root route — API info
+app.get('/', (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: '✅ API is working',
+        api: 'Lattice Event Management API',
+        version: '1.0.0',
+        documentation: '/api-docs',
+        endpoints: {
+            users: '/api/users',
+            events: '/api/events',
+            bookings: '/api/bookings',
+            attendance: '/api/attendance',
+        },
+        timestamp: new Date().toISOString(),
+    });
+});
 
 // Swagger docs
 const swaggerDocument = YAML.load('./swagger.yaml');
@@ -30,7 +49,7 @@ app.use('/api', attendanceRoutes);
 
 // 404 handler
 app.use((req, res) => {
-    res.status(404).json({ success: false, message: 'Route not found' });
+    res.status(404).json({ success: false, message: '404: Route not found' });
 });
 
 // Global error handler
@@ -38,6 +57,7 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log(`�docs Swagger docs at http://localhost:${PORT}/api-docs`);
+    console.log(`Server running on http://localhost:${PORT}`);
+
+    console.log(`docs Swagger docs at http://localhost:${PORT}/api-docs`);
 });

@@ -1,13 +1,6 @@
--- ============================================
--- Mini Event Management System - Database Schema
--- ============================================
-
 CREATE DATABASE IF NOT EXISTS event_booking_db;
 USE event_booking_db;
 
--- ============================================
--- Table: users
--- ============================================
 CREATE TABLE IF NOT EXISTS users (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -15,9 +8,6 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- ============================================
--- Table: events
--- ============================================
 CREATE TABLE IF NOT EXISTS events (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(200) NOT NULL,
@@ -29,9 +19,6 @@ CREATE TABLE IF NOT EXISTS events (
     CONSTRAINT chk_remaining CHECK (remaining_tickets <= total_capacity)
 );
 
--- ============================================
--- Table: bookings
--- ============================================
 CREATE TABLE IF NOT EXISTS bookings (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id INT UNSIGNED NOT NULL,
@@ -42,9 +29,6 @@ CREATE TABLE IF NOT EXISTS bookings (
     CONSTRAINT fk_booking_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
 );
 
--- ============================================
--- Table: event_attendance
--- ============================================
 CREATE TABLE IF NOT EXISTS event_attendance (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     booking_id INT UNSIGNED NOT NULL UNIQUE,
@@ -56,9 +40,6 @@ CREATE TABLE IF NOT EXISTS event_attendance (
     CONSTRAINT fk_attendance_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
 );
 
--- ============================================
--- Sample Data (optional for testing)
--- ============================================
 INSERT INTO users (name, email) VALUES
 ('Rahul Sharma', 'rahul@example.com'),
 ('Priya Patel', 'priya@example.com'),
